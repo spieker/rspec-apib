@@ -1,0 +1,14 @@
+---
+engines:
+  rubocop:
+    enabled: false
+  bundler-audit:
+    enabled: true
+ratings:
+  paths:
+  - "**.rb"
+exclude_paths:
+- config/**/*
+- db/**/*
+- spec/**/*
+- vendor/**/*

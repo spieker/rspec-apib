@@ -1,0 +1,6 @@
+.dockerignore
+Dockerfile
+tmp
+coverage
+doc
+log
