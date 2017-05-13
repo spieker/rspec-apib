@@ -10,15 +10,16 @@ ENV APP_HOME /usr/src/app
 RUN mkdir $APP_HOME
 WORKDIR $APP_HOME
 
+# Install bundler
+RUN gem install bundler
+
+# Increase Bundler workers
+ENV BUNDLE_JOBS=2
+
 # Copy working directory
-ADD . $APP_HOME
+COPY . $APP_HOME
 
-# Set Bundler cache directory outside of app scope
-ENV BUNDLE_GEMFILE=$APP_HOME/Gemfile \
-    BUNDLE_JOBS=2 \
-    BUNDLE_PATH=/bundle
-
-# Install gems
+# Install newer version of Bundler and gems
 RUN bundle install
 
 # Add bin/ folder to PATH
