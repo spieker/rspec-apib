@@ -33,11 +33,11 @@ module RSpec
 
       # The routing object for the rails route of the request
       def route
-        @route ||= begin
-          route = routes.router.send(:find_routes, request).first
-          route = route.third if route.present?
-          route
+        return @route if @route
+        routes.router.recognize(request) do |r, params|
+          @route = r
         end
+        @route
       end
 
       # The top level example group the example is contained in
@@ -56,7 +56,11 @@ module RSpec
           parts = route.parts
           tmp = {}
           parts.each do |part|
-            if route.optional_parts.include?(part)
+            optional_parts = route.respond_to?(:optional_parts) ?
+                               route.optional_parts :
+                               (route.parts - route.required_parts)
+
+            if optional_parts.include?(part)
               tmp[part] = "(:#{part}:)"
             else
               tmp[part] = ":#{part}:"

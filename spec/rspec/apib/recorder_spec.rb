@@ -1,11 +1,18 @@
 require 'spec_helper'
 
 describe RSpec::Apib::Recorder do
+  def stub_request(env = {})
+    ip_app = ActionDispatch::RemoteIp.new(Proc.new {})
+    ip_app.call(env)
+    ActionDispatch::Request.new(env)
+  end
+
   let(:example)   { double() }
-  let(:request)   { double() }
   let(:response)  { double() }
-  let(:routes)    { double() }
+  let(:routes)    { ActionDispatch::Routing::RouteSet.new }
+  let(:mapper)    { ActionDispatch::Routing::Mapper.new routes }
   let(:doc)       { {} }
+  let(:request)   { stub_request "SCRIPT_NAME" => "", "PATH_INFO" => "/foo/5", "REQUEST_METHOD" => "GET" }
 
   subject { described_class.new(example, request, response, routes, doc) }
 
@@ -63,7 +70,19 @@ describe RSpec::Apib::Recorder do
   pending '#request_param_blacklist'
   pending '#route'
   pending '#example_group'
-  pending '#path'
+
+  describe '#path' do
+    it 'highlights required parts' do
+      mapper.get "/foo/:id", to: "foo#bar", as: "baz"
+      expect(subject.send(:path)).to eql '/foo/{id}(.{format})'
+    end
+
+    it 'highlights optional parts' do
+      mapper.get "/foo/(:id)", to: "foo#bar", as: "baz"
+      expect(subject.send(:path)).to eql '/foo(/{id})(.{format})'
+    end
+  end
+
   pending '#group'
   pending '#resource_type'
   pending '#resource_name'
