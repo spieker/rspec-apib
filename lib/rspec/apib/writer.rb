@@ -37,7 +37,7 @@ module RSpec
           group.each do |action, data|
             apib += "## #{action}\n\n"
 
-            if data[:request][:params].length > 0
+            if data[:request][:params] && data[:request][:params].length > 0
               apib += "+ Parameters\n\n"
               data[:request][:params].each do |name, param|
                 required = param[:required] ? 'required' : 'optional'
