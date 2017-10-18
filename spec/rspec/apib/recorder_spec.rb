@@ -193,6 +193,26 @@ describe RSpec::Apib::Recorder do
       data   = action[:response].first
       expect(data[:description]).to eql "foo\nbar\n\nCDE\n"
     end
+
+    # --- apib
+    # ### foo
+    it 'is not stripping out markdown control characters' do |example|
+      subject = described_class.new(example, request, response, routes, doc)
+      action = subject.tap { |s| s.run }.send(:action)
+      data   = action[:response].first
+      expect(data[:description]).to eql "### foo"
+    end
+
+    # --- apib
+    # foobar
+    # ------
+    # hello
+    it 'is accepts headline underscores' do |example|
+      subject = described_class.new(example, request, response, routes, doc)
+      action = subject.tap { |s| s.run }.send(:action)
+      data   = action[:response].first
+      expect(data[:description]).to eql "foobar\n------\nhello"
+    end
   end
 
   pending '#document_response'

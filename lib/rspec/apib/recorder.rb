@@ -154,8 +154,8 @@ module RSpec
         return if lines.count < line
         i = line -2
         m = false
-        while (i >= 0 && lines[i].match(/\A\W*#/)) do
-          if lines[i - 1].match(/\A\W*# --- apib/)
+        while (i >= 0 && lines[i].match(/\A\s*#/)) do
+          if lines[i - 1].match(/\A\s*# --- apib/)
             m = true
             break
           end
@@ -163,11 +163,11 @@ module RSpec
         end
         return unless m
         result = []
-        while (i < line && lines[i].match(/\A\W*#/)) do
-          if lines[i].match(/\A\W*# ---/)
+        while (i < line && lines[i].match(/\A\s*#/)) do
+          if lines[i].match(/\A\s*# ---\s*\z/)
             break
           end
-          result << lines[i].sub(/^\W*#\W*/, '').strip
+          result << lines[i].sub(/^\s*#\s*/, '').strip
           i += 1
         end
         return result.join("\n")
