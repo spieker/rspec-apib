@@ -141,6 +141,60 @@ describe RSpec::Apib::Recorder do
     end
   end
 
+  describe '#document_extended_description' do
+    # --- apib
+    # This is a comment used as description.
+    # ---
+    it 'replaces the description with the comment above the example' do |example|
+      subject = described_class.new(example, request, response, routes, doc)
+      action = subject.tap { |s| s.run }.send(:action)
+      data   = action[:response].first
+      expect(data[:description]).to eql 'This is a comment used as description.'
+    end
+
+    # --- apib
+    # foo
+    # bar
+    # ---
+    it 'handles multi line comments' do |example|
+      subject = described_class.new(example, request, response, routes, doc)
+      action = subject.tap { |s| s.run }.send(:action)
+      data   = action[:response].first
+      expect(data[:description]).to eql "foo\nbar"
+    end
+
+    # ABC
+    #
+    # --- apib
+    # foo
+    # bar
+    # ---
+    #
+    # CDE
+    #
+    it 'ignores surrounding comments' do |example|
+      subject = described_class.new(example, request, response, routes, doc)
+      action = subject.tap { |s| s.run }.send(:action)
+      data   = action[:response].first
+      expect(data[:description]).to eql "foo\nbar"
+    end
+
+    # ABC
+    #
+    # --- apib
+    # foo
+    # bar
+    #
+    # CDE
+    #
+    it 'works without ending string' do |example|
+      subject = described_class.new(example, request, response, routes, doc)
+      action = subject.tap { |s| s.run }.send(:action)
+      data   = action[:response].first
+      expect(data[:description]).to eql "foo\nbar\n\nCDE\n"
+    end
+  end
+
   pending '#document_response'
   pending '#response_exists?'
 end

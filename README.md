@@ -58,6 +58,25 @@ documentation out of it.
   end
   ```
 
+* **Custom example description:** Add an *apib* comment above the example
+  ```ruby
+  # Not contained in the description
+  #
+  # --- apib
+  # Some awesome description of the response
+  #
+  # ```json
+  # {}
+  # ```
+  # ---
+  #
+  # Not contained in the description
+  #
+  it 'has a custom description' do
+    # ...
+  end
+  ```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

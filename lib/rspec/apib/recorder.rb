@@ -136,12 +136,41 @@ module RSpec
       def document_response
         data = {}
         return if response_exists?
-        data[:description]  = example.description
+        data[:description]  = document_extended_description || example.description
         data[:status]       = response.status
         data[:content_type] = response.content_type.to_s
         data[:body]         = response.body
         data[:headers]      = response.headers
         action[:response] << data
+      end
+
+      def document_extended_description
+        file = example.metadata[:absolute_file_path]
+        line = example.metadata[:line_number]
+        return if file.nil? || file.empty?
+        return if line.nil? || line <= 0
+        return unless File.exists?(file)
+        lines = IO.readlines(file)
+        return if lines.count < line
+        i = line -2
+        m = false
+        while (i >= 0 && lines[i].match(/\A\W*#/)) do
+          if lines[i - 1].match(/\A\W*# --- apib/)
+            m = true
+            break
+          end
+          i -= 1
+        end
+        return unless m
+        result = []
+        while (i < line && lines[i].match(/\A\W*#/)) do
+          if lines[i].match(/\A\W*# ---/)
+            break
+          end
+          result << lines[i].sub(/^\W*#\W*/, '').strip
+          i += 1
+        end
+        return result.join("\n")
       end
 
       def response_exists?
