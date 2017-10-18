@@ -45,6 +45,19 @@ end
 RSpec::Apib.start
 ```
 
+### Writing tests
+
+By default, request specs get recorded and written to a `.apib` file afterwards.
+Rspec-apib is trying to make sense of the test run and generates a meaningful
+documentation out of it.
+
+* **Disable single examples:** Add `apib: false` to the examples meta data
+  ```ruby
+  it 'does something', apib: false do
+    # ...
+  end
+  ```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
