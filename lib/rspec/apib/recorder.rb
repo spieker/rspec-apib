@@ -114,6 +114,7 @@ module RSpec
           next unless k.starts_with?('HTTP_')
           header = k.gsub('HTTP_', '').downcase
           next if request_header_blacklist.include? header
+          next if v.nil? || v.empty?
           action[:request][:headers][header] = v
         end
       end

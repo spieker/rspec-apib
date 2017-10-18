@@ -7,14 +7,45 @@ describe RSpec::Apib::Recorder do
     ActionDispatch::Request.new(env)
   end
 
-  let(:example)   { double() }
-  let(:response)  { double() }
+  let(:example) do
+    double(
+      metadata: {
+        example_group: {}
+      },
+      description: 'foo example'
+    )
+  end
+
+  let(:response) do
+    double(
+      status: 200,
+      content_type: 'application/json',
+      body: '{}',
+      headers: {}
+    )
+  end
+
   let(:routes)    { ActionDispatch::Routing::RouteSet.new }
   let(:mapper)    { ActionDispatch::Routing::Mapper.new routes }
   let(:doc)       { {} }
-  let(:request)   { stub_request "SCRIPT_NAME" => "", "PATH_INFO" => "/foo/5", "REQUEST_METHOD" => "GET" }
+
+  let(:request) do
+    request = stub_request(
+      "SCRIPT_NAME" => "",
+      "PATH_INFO" => "/foo/5",
+      "REQUEST_METHOD" => "GET",
+      "HTTP_ORIGIN" => "foobar",
+      "rack.input" => StringIO.new('{}')
+    )
+  end
 
   subject { described_class.new(example, request, response, routes, doc) }
+
+  before :each do
+    routes.draw do
+      get '/foo/:id' => 'foo#bar'
+    end
+  end
 
   it { should respond_to :run }
 
@@ -89,6 +120,27 @@ describe RSpec::Apib::Recorder do
   pending '#action'
   pending '#document_request'
   pending '#document_request_header'
+
+  describe '#document_request_header' do
+    it 'records headers' do
+      action = subject.tap { |s| s.run }.send(:action)
+      expect(action[:request][:headers]['origin']).to eql 'foobar'
+    end
+
+    it 'is not recording empty headers' do
+      request = stub_request(
+        "SCRIPT_NAME" => "",
+        "PATH_INFO" => "/foo/5",
+        "REQUEST_METHOD" => "GET",
+        "HTTP_ORIGIN" => "",
+        "rack.input" => StringIO.new('{}')
+      )
+      subject = described_class.new(example, request, response, routes, doc)
+      action = subject.tap { |s| s.run }.send(:action)
+      expect(action[:request][:headers]).to_not have_key 'origin'
+    end
+  end
+
   pending '#document_response'
   pending '#response_exists?'
 end
