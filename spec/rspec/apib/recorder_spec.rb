@@ -213,6 +213,16 @@ describe RSpec::Apib::Recorder do
       data   = action[:response].first
       expect(data[:description]).to eql "foobar\n------\nhello"
     end
+
+    # --- apib
+    # + foobar
+    #     + hello
+    it 'keeps subsequent indentation' do |example|
+      subject = described_class.new(example, request, response, routes, doc)
+      action = subject.tap { |s| s.run }.send(:action)
+      data   = action[:response].first
+      expect(data[:description]).to eql "+ foobar\n    + hello"
+    end
   end
 
   pending '#document_response'

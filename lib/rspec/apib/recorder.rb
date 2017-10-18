@@ -167,7 +167,7 @@ module RSpec
           if lines[i].match(/\A\s*# ---\s*\z/)
             break
           end
-          result << lines[i].sub(/^\s*#\s*/, '').strip
+          result << lines[i].sub(/^\s*#( |)/, '').rstrip
           i += 1
         end
         return result.join("\n")
