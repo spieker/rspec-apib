@@ -60,4 +60,38 @@ describe RSpec::Apib::Writer do
   pending '#pre_docs'
   pending '#post_docs'
   pending '#build'
+
+  describe '#build' do
+    let(:doc) do
+      {
+        'foo' => {
+          'GET' => {
+            request: {
+              headers: {}
+            },
+            response: [doc_response]
+          }
+        }
+      }
+    end
+
+    let(:doc_response) do
+      {
+        status: 200,
+        headers: {},
+        description: "foo\nbar"
+      }
+    end
+
+    it 'adds propper indentation to multi line descriptions' do
+      result = subject.send :build
+      expect(result).to include "    foo\n    bar"
+    end
+
+    it 'it works with a nil description' do
+      doc_response[:description] = nil
+      result = subject.send :build
+      expect(result).to be_a String
+    end
+  end
 end

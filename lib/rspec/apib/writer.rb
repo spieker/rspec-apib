@@ -60,7 +60,7 @@ module RSpec
             end
             data[:response].sort { |a, b| a[:status] - b[:status] }.each do |response|
               apib += "+ Response #{response[:status]}\n\n"
-              apib += "    #{response[:description]}\n\n"
+              apib += "#{response[:description].indent(2, '  ')}\n\n" if response[:description]
               apib += "    + Headers\n\n"
               response[:headers].each do |header, value|
                 apib += "            #{header}: #{value}\n"
