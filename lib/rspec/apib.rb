@@ -25,9 +25,10 @@ module RSpec
         types = config.record_types
         RSpec.configure do |config|
           config.after :each do |example|
-            return if example.metadata[:apib] === false
-            return unless types.include?(example.metadata[:type])
-            RSpec::Apib.record(example, request, response, @routes)
+            if types.include?(example.metadata[:type]) &&
+              !(example.metadata[:apib] === false)
+              RSpec::Apib.record(example, request, response, @routes)
+            end
           end
 
           config.after :all do |example|
