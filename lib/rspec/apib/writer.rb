@@ -29,10 +29,14 @@ module RSpec
         RSpec::Apib.config.post_docs.map { |f| File.read(f) }.join("\n\n")
       end
 
+      def sorted_apib
+        @apib.to_a.sort { |a, b| a[0] <=> b[0] }
+      end
+
       def build
         apib = ""
 
-        @apib.each do |group_name, group|
+        sorted_apib.each do |group_name, group|
           apib += "# Group #{group_name}\n\n"
           group.each do |action, data|
             apib += "## #{action}\n\n"

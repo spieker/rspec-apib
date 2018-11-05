@@ -71,6 +71,14 @@ describe RSpec::Apib::Writer do
             },
             response: [doc_response]
           }
+        },
+        'baz' => {
+          'GET' => {
+            request: {
+              headers: {}
+            },
+            response: [doc_response]
+          }
         }
       }
     end
@@ -92,6 +100,14 @@ describe RSpec::Apib::Writer do
       doc_response[:description] = nil
       result = subject.send :build
       expect(result).to be_a String
+    end
+
+    it 'sorts the groups alphabetically' do
+      doc_response[:description] = nil
+      result = subject.send :build
+      pos_foo = result.index('# Group foo')
+      pos_baz = result.index('# Group baz')
+      expect(pos_baz).to be < pos_foo
     end
   end
 end
