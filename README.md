@@ -1,8 +1,8 @@
 # Rspec::Apib
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/rspec/apib`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+This is meant to be a drop-in solution for generating an API documentation from
+existing RSpec request specs. The result is not always perfect, but hopefully
+gives your developers and/or customers an idea of how your API works.
 
 ## Installation
 
