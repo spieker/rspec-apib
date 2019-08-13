@@ -19,6 +19,10 @@ module RSpec
         document_response
       end
 
+      def comments_parser
+        @comments_parser ||= CommentsParser.new(example)
+      end
+
       private
 
       # Request headers contained in the blacklist will not be included in the
@@ -102,6 +106,7 @@ module RSpec
       def document_request
         document_request_params
         return if response.status >= action[:request][:_status]
+        action[:request][:description] = comments_parser.description("request")
         action[:request][:_status] = response.status
         action[:request][:path]    = request.path
         action[:request][:body]    = request.body.read
@@ -136,41 +141,12 @@ module RSpec
       def document_response
         data = {}
         return if response_exists?
-        data[:description]  = document_extended_description || example.description
+        data[:description]  = comments_parser.description("response") || example.description
         data[:status]       = response.status
         data[:content_type] = response.content_type.to_s
         data[:body]         = response.body
         data[:headers]      = response.headers
         action[:response] << data
-      end
-
-      def document_extended_description
-        file = example.metadata[:absolute_file_path]
-        line = example.metadata[:line_number]
-        return if file.nil? || file.empty?
-        return if line.nil? || line <= 0
-        return unless File.exists?(file)
-        lines = IO.readlines(file)
-        return if lines.count < line
-        i = line -2
-        m = false
-        while (i >= 0 && lines[i].match(/\A\s*#/)) do
-          if lines[i - 1].match(/\A\s*# --- apib/)
-            m = true
-            break
-          end
-          i -= 1
-        end
-        return unless m
-        result = []
-        while (i < line && lines[i].match(/\A\s*#/)) do
-          if lines[i].match(/\A\s*# ---\s*\z/)
-            break
-          end
-          result << lines[i].sub(/^\s*#( |)/, '').rstrip
-          i += 1
-        end
-        return result.join("\n")
       end
 
       def response_exists?

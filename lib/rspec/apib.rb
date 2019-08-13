@@ -1,6 +1,7 @@
 require 'rails'
 require 'rspec/apib/version'
 require 'rspec/apib/configuration'
+require 'rspec/apib/comments_parser'
 require 'rspec/apib/recorder'
 require 'rspec/apib/writer'
 

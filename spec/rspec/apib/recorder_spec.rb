@@ -142,86 +142,114 @@ describe RSpec::Apib::Recorder do
   end
 
   describe '#document_extended_description' do
-    # --- apib
-    # This is a comment used as description.
-    # ---
-    it 'replaces the description with the comment above the example' do |example|
-      subject = described_class.new(example, request, response, routes, doc)
-      action = subject.tap { |s| s.run }.send(:action)
-      data   = action[:response].first
-      expect(data[:description]).to eql 'This is a comment used as description.'
+    context 'only response description is included' do
+      # --- apib:response
+      # This is a comment used as description.
+      # ---
+      it 'replaces the description with the comment above the example' do |example|
+        subject = described_class.new(example, request, response, routes, doc)
+        action = subject.tap { |s| s.run }.send(:action)
+        data   = action[:response].first
+        expect(data[:description]).to eql 'This is a comment used as description.'
+      end
+
+      # --- apib:response
+      # foo
+      # bar
+      # ---
+      it 'handles multi line comments' do |example|
+        subject = described_class.new(example, request, response, routes, doc)
+        action = subject.tap { |s| s.run }.send(:action)
+        data   = action[:response].first
+        expect(data[:description]).to eql "foo\nbar"
+      end
+
+      # ABC
+      #
+      # --- apib:response
+      # foo
+      # bar
+      # ---
+      #
+      # CDE
+      #
+      it 'ignores surrounding comments' do |example|
+        subject = described_class.new(example, request, response, routes, doc)
+        action = subject.tap { |s| s.run }.send(:action)
+        data   = action[:response].first
+        expect(data[:description]).to eql "foo\nbar"
+      end
+
+      # ABC
+      #
+      # --- apib:response
+      # foo
+      # bar
+      #
+      # CDE
+      #
+      it 'works without ending string' do |example|
+        subject = described_class.new(example, request, response, routes, doc)
+        action = subject.tap { |s| s.run }.send(:action)
+        data   = action[:response].first
+        expect(data[:description]).to eql "foo\nbar\n\nCDE\n"
+      end
+
+      # --- apib:response
+      # ### foo
+      it 'is not stripping out markdown control characters' do |example|
+        subject = described_class.new(example, request, response, routes, doc)
+        action = subject.tap { |s| s.run }.send(:action)
+        data   = action[:response].first
+        expect(data[:description]).to eql "### foo"
+      end
+
+      # --- apib:response
+      # foobar
+      # ------
+      # hello
+      it 'is accepts headline underscores' do |example|
+        subject = described_class.new(example, request, response, routes, doc)
+        action = subject.tap { |s| s.run }.send(:action)
+        data   = action[:response].first
+        expect(data[:description]).to eql "foobar\n------\nhello"
+      end
+
+      # --- apib:response
+      # + foobar
+      #     + hello
+      it 'keeps subsequent indentation' do |example|
+        subject = described_class.new(example, request, response, routes, doc)
+        action = subject.tap { |s| s.run }.send(:action)
+        data   = action[:response].first
+        expect(data[:description]).to eql "+ foobar\n+ hello"
+      end
     end
 
-    # --- apib
-    # foo
-    # bar
-    # ---
-    it 'handles multi line comments' do |example|
-      subject = described_class.new(example, request, response, routes, doc)
-      action = subject.tap { |s| s.run }.send(:action)
-      data   = action[:response].first
-      expect(data[:description]).to eql "foo\nbar"
-    end
+    context 'both request and response have description' do
+      # --- apib:request
+      # Request comment
+      # --- apib:response
+      # Response comment
+      # ---
+      it 'saves request description if we have a request and response description' do |example|
+        subject = described_class.new(example, request, response, routes, doc)
+        action = subject.tap { |s| s.run }.send(:action)
+        request_data  = action[:request]
+        response_data = action[:response].first
+        expect(response_data[:description]).to eql 'Response comment'
+        expect(request_data[:description]).to eql 'Request comment'
+      end
 
-    # ABC
-    #
-    # --- apib
-    # foo
-    # bar
-    # ---
-    #
-    # CDE
-    #
-    it 'ignores surrounding comments' do |example|
-      subject = described_class.new(example, request, response, routes, doc)
-      action = subject.tap { |s| s.run }.send(:action)
-      data   = action[:response].first
-      expect(data[:description]).to eql "foo\nbar"
-    end
-
-    # ABC
-    #
-    # --- apib
-    # foo
-    # bar
-    #
-    # CDE
-    #
-    it 'works without ending string' do |example|
-      subject = described_class.new(example, request, response, routes, doc)
-      action = subject.tap { |s| s.run }.send(:action)
-      data   = action[:response].first
-      expect(data[:description]).to eql "foo\nbar\n\nCDE\n"
-    end
-
-    # --- apib
-    # ### foo
-    it 'is not stripping out markdown control characters' do |example|
-      subject = described_class.new(example, request, response, routes, doc)
-      action = subject.tap { |s| s.run }.send(:action)
-      data   = action[:response].first
-      expect(data[:description]).to eql "### foo"
-    end
-
-    # --- apib
-    # foobar
-    # ------
-    # hello
-    it 'is accepts headline underscores' do |example|
-      subject = described_class.new(example, request, response, routes, doc)
-      action = subject.tap { |s| s.run }.send(:action)
-      data   = action[:response].first
-      expect(data[:description]).to eql "foobar\n------\nhello"
-    end
-
-    # --- apib
-    # + foobar
-    #     + hello
-    it 'keeps subsequent indentation' do |example|
-      subject = described_class.new(example, request, response, routes, doc)
-      action = subject.tap { |s| s.run }.send(:action)
-      data   = action[:response].first
-      expect(data[:description]).to eql "+ foobar\n    + hello"
+      # --- apib:request
+      # Request comment
+      # ---
+      it 'saves request description if we have only a request description' do |example|
+        subject = described_class.new(example, request, response, routes, doc)
+        action = subject.tap { |s| s.run }.send(:action)
+        request_data = action[:request]
+        expect(request_data[:description]).to eql 'Request comment'
+      end
     end
   end
 

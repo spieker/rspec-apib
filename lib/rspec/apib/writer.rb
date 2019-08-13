@@ -52,6 +52,7 @@ module RSpec
             end
 
             apib += "+ Request\n\n"
+            apib += "#{data[:request][:description].indent(2, '  ')}\n\n" if data[:request][:description]
             apib += "    + Headers\n\n"
             data[:request][:headers].each do |header, value|
               apib += "            #{header}: #{value}\n"
