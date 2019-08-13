@@ -102,6 +102,13 @@ module RSpec
       def document_request
         document_request_params
         return if response.status >= action[:request][:_status]
+        action[:request][:description]  = document_extended_description(
+                                          start_matcher: "# --- apib_request",
+                                          end_matchers:  [
+                                            "# --- apib_response",
+                                            "# ---"
+                                          ]
+                                         )
         action[:request][:_status] = response.status
         action[:request][:path]    = request.path
         action[:request][:body]    = request.body.read
@@ -136,7 +143,13 @@ module RSpec
       def document_response
         data = {}
         return if response_exists?
-        data[:description]  = document_extended_description || example.description
+        data[:description]  = document_extended_description(
+                                start_matcher: "# --- apib_response",
+                                end_matchers:  [
+                                  "# --- apib_request",
+                                  "# ---"
+                                ]
+                              ) || example.description
         data[:status]       = response.status
         data[:content_type] = response.content_type.to_s
         data[:body]         = response.body
@@ -144,7 +157,7 @@ module RSpec
         action[:response] << data
       end
 
-      def document_extended_description
+      def document_extended_description(start_matcher:, end_matchers:)
         file = example.metadata[:absolute_file_path]
         line = example.metadata[:line_number]
         return if file.nil? || file.empty?
@@ -155,7 +168,7 @@ module RSpec
         i = line -2
         m = false
         while (i >= 0 && lines[i].match(/\A\s*#/)) do
-          if lines[i - 1].match(/\A\s*# --- apib/)
+          if lines[i - 1].match(/\A\s*#{start_matcher}/)
             m = true
             break
           end
@@ -164,8 +177,8 @@ module RSpec
         return unless m
         result = []
         while (i < line && lines[i].match(/\A\s*#/)) do
-          if lines[i].match(/\A\s*# ---\s*\z/)
-            break
+          break if end_matchers.any? do |end_matcher|
+            lines[i].match(/\A\s*#{end_matcher}\s*\z/)
           end
           result << lines[i].sub(/^\s*#( |)/, '').rstrip
           i += 1

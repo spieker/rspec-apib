@@ -51,18 +51,42 @@ By default, request specs get recorded and written to a `.apib` file afterwards.
 Rspec-apib is trying to make sense of the test run and generates a meaningful
 documentation out of it.
 
-* **Disable single examples:** Add `apib: false` to the examples meta data
+- **Disable single examples:** Add `apib: false` to the examples meta data
+
   ```ruby
   it 'does something', apib: false do
     # ...
   end
   ```
 
-* **Custom example description:** Add an *apib* comment above the example
-  ```ruby
+- **Custom example description:** Add an _apib_ comment above the example
+  You can add a description for the request, response or both.
+
+  Description only for the request
+
+  ````ruby
   # Not contained in the description
   #
-  # --- apib
+  # --- apib_request
+  # Some awesome description of the request
+  #
+  # ```json
+  # {}
+  # ```
+  # ---
+  #
+  # Not contained in the description
+  #
+  it 'has a custom description' do
+    # ...
+  end
+  ````
+
+  Description only for the response
+
+  ````ruby
+  # Not contained in the description
+  # -- apid_response
   # Some awesome description of the response
   #
   # ```json
@@ -75,7 +99,30 @@ documentation out of it.
   it 'has a custom description' do
     # ...
   end
-  ```
+  ````
+
+  Description for both request and response
+
+  ````ruby
+  # Not contained in the description
+  #
+  # --- apib_request
+  # Some awesome description of the request
+  #
+  # -- apid_response
+  # Some awesome description of the response
+  #
+  # ```json
+  # {}
+  # ```
+  # ---
+  #
+  # Not contained in the description
+  #
+  it 'has a custom description' do
+    # ...
+  end
+  ````
 
 ## Development
 
@@ -88,7 +135,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 To do continuous testing during development `guard` can be used. In order to
 test against multiple versions of Rails, the environment variable
 `RAILS_VERSION` can be used to choose a different dependency pattern then the
-default one specified in the *.gemspec* file.
+default one specified in the _.gemspec_ file.
 
 ```
 RAILS_VERSION='~> 4.0' bundle install; bundle exec rspec
