@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe RSpec::Apib do
+  let(:ex) { double(metadata: { type: :request }) }
+
   it 'has a version number' do
     expect(RSpec::Apib::VERSION).not_to be nil
   end
@@ -62,8 +64,6 @@ describe RSpec::Apib do
     end
 
     describe 'after(:each)' do
-      let(:ex) { double(metadata: { type: :request }) }
-
       it 'calls #record' do
         allow(config).to receive(:after).with(:each) do |arg, &block|
           expect(RSpec::Apib).to receive(:record).with(ex, 'foo', 'bar', 'baz')
@@ -85,10 +85,45 @@ describe RSpec::Apib do
         RSpec::Apib.start
       end
 
-      it 'is not calling #record if disabled for current example' do
+      it 'if drp is not set, is not calling #record' do
+        allow(RSpec::Apib.config).to receive(:default_recording_policy).and_return false
+        allow(config).to receive(:after).with(:each) do |arg, &block|
+          expect(RSpec::Apib).to_not receive(:record)
+          context = double(request: 'foo', response: 'bar')
+          context.instance_variable_set :'@routes', 'baz'
+          context.instance_exec(ex, &block)
+        end
+        RSpec::Apib.start
+      end
+
+      it 'if drp is not set but apib is true, is calling #record' do
+        allow(RSpec::Apib.config).to receive(:default_recording_policy).and_return false
+        ex.metadata[:apib] = true
+        allow(config).to receive(:after).with(:each) do |arg, &block|
+          expect(RSpec::Apib).to receive(:record)
+          context = double(request: 'foo', response: 'bar')
+          context.instance_variable_set :'@routes', 'baz'
+          context.instance_exec(ex, &block)
+        end
+        RSpec::Apib.start
+      end
+
+      it 'if drp is set but apib is false, is not calling #record' do
+        allow(RSpec::Apib.config).to receive(:default_recording_policy).and_return true
         ex.metadata[:apib] = false
         allow(config).to receive(:after).with(:each) do |arg, &block|
           expect(RSpec::Apib).to_not receive(:record)
+          context = double(request: 'foo', response: 'bar')
+          context.instance_variable_set :'@routes', 'baz'
+          context.instance_exec(ex, &block)
+        end
+        RSpec::Apib.start
+      end
+
+      it 'if drp is set, is calling #record' do
+        allow(RSpec::Apib.config).to receive(:default_recording_policy).and_return true
+        allow(config).to receive(:after).with(:each) do |arg, &block|
+          expect(RSpec::Apib).to receive(:record)
           context = double(request: 'foo', response: 'bar')
           context.instance_variable_set :'@routes', 'baz'
           context.instance_exec(ex, &block)
@@ -144,6 +179,30 @@ describe RSpec::Apib do
       allow(RSpec::Apib::Writer).to receive(:new).and_return writer
       expect(writer).to receive :write
       RSpec::Apib.write
+    end
+  end
+
+  describe '#record?' do
+    it 'when drp is set, it returns true' do
+      allow(RSpec::Apib.config).to receive(:default_recording_policy).and_return true
+      expect(RSpec::Apib.record?(ex)).to be true
+    end
+
+    it 'when drp is set and apib is false, it returns false' do
+      allow(RSpec::Apib.config).to receive(:default_recording_policy).and_return true
+      ex.metadata[:apib] = false
+      expect(RSpec::Apib.record?(ex)).to be false
+    end
+
+    it 'when drp is not set and apib is true, it returns true' do
+      allow(RSpec::Apib.config).to receive(:default_recording_policy).and_return false
+      ex.metadata[:apib] = true
+      expect(RSpec::Apib.record?(ex)).to be true
+    end
+
+    it 'when drp is not set, it returns false' do
+      allow(RSpec::Apib.config).to receive(:default_recording_policy).and_return false
+      expect(RSpec::Apib.record?(ex)).to be false
     end
   end
 end

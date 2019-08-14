@@ -23,11 +23,9 @@ module RSpec
       end
 
       def start
-        types = config.record_types
         RSpec.configure do |config|
           config.after :each do |example|
-            if types.include?(example.metadata[:type]) &&
-              !(example.metadata[:apib] === false)
+            if RSpec::Apib.record?(example)
               RSpec::Apib.record(example, request, response, @routes)
             end
           end
@@ -47,6 +45,15 @@ module RSpec
       def write
         writer = Writer.new(@_doc || {})
         writer.write
+      end
+
+      def record?(example)
+        default_recording_policy = config.default_recording_policy
+        config.record_types.include?(example.metadata[:type]) &&
+          (
+            default_recording_policy && !(example.metadata[:apib] === false) ||
+            !default_recording_policy && (example.metadata[:apib] === true)
+          )
       end
     end
   end

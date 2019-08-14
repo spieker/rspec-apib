@@ -12,6 +12,8 @@ describe RSpec::Apib::Configuration do
   it { should respond_to :request_header_blacklist= }
   it { should respond_to :request_param_blacklist }
   it { should respond_to :request_param_blacklist= }
+  it { should respond_to :default_recording_policy }
+  it { should respond_to :default_recording_policy= }
 
   describe '#dest_file' do
     it 'equals the rails root by default' do
@@ -86,6 +88,13 @@ describe RSpec::Apib::Configuration do
     it 'equals the given value if it was an array' do
       subject.record_types = [:foo, :bar]
       expect(subject.record_types).to eql [:foo, :bar]
+    end
+  end
+
+  describe '#default_recording_policy' do
+    it 'contains the given value' do
+      subject.default_recording_policy = false
+      expect(subject.default_recording_policy).to eql false
     end
   end
 end
