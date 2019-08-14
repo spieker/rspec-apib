@@ -23,10 +23,15 @@ module RSpec
 
       def start
         types = config.record_types
+        inclusion_policy = config.inclusion_policy
+
         RSpec.configure do |config|
           config.after :each do |example|
             if types.include?(example.metadata[:type]) &&
-              !(example.metadata[:apib] === false)
+              (
+                !(example.metadata[:apib] === false) ||
+                inclusion_policy == :all
+              )
               RSpec::Apib.record(example, request, response, @routes)
             end
           end

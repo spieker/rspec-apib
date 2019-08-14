@@ -95,6 +95,41 @@ describe RSpec::Apib do
         end
         RSpec::Apib.start
       end
+
+      it 'is not calling #record if disabled for current example and inclusion_policy = :optin' do
+        ex.metadata[:apib] = false
+        allow(config).to receive(:after).with(:each) do |arg, &block|
+          expect(RSpec::Apib).to_not receive(:record)
+          context = double(request: 'foo', response: 'bar')
+          context.instance_variable_set :'@routes', 'baz'
+          context.instance_exec(ex, &block)
+        end
+        RSpec::Apib.config.inclusion_policy = :optin
+        RSpec::Apib.start
+      end
+
+      it 'is calling #record if disabled for current example and inclusion_policy = :all' do
+        ex.metadata[:apib] = false
+        allow(config).to receive(:after).with(:each) do |arg, &block|
+          expect(RSpec::Apib).to receive(:record)
+          context = double(request: 'foo', response: 'bar')
+          context.instance_variable_set :'@routes', 'baz'
+          context.instance_exec(ex, &block)
+        end
+        RSpec::Apib.config.inclusion_policy = :all
+        RSpec::Apib.start
+      end
+
+      it 'is calling #record if inclusion_policy = :all' do
+        allow(config).to receive(:after).with(:each) do |arg, &block|
+          expect(RSpec::Apib).to receive(:record)
+          context = double(request: 'foo', response: 'bar')
+          context.instance_variable_set :'@routes', 'baz'
+          context.instance_exec(ex, &block)
+        end
+        RSpec::Apib.config.inclusion_policy = :all
+        RSpec::Apib.start
+      end
     end
 
     describe 'after(:all)' do
