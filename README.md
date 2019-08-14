@@ -40,6 +40,14 @@ RSpec::Apib.configure do |config|
 
   # Example types to record
   config.record_types = [:request]
+
+  # Recording policy
+
+  # The default recording policy is `true`. This results in a recording of
+  # all matching specs. By changing this policy to `false`, you can selectively
+  # include certain specs by adding `apib: true` to your example options.
+  #
+  # config.default_recording_policy = false
 end
 # ...
 RSpec::Apib.start
