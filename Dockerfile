@@ -1,4 +1,4 @@
-FROM ruby:2.2
+FROM ruby:2.6
 
 # Install dependencies
 RUN apt-get update -qq && \
