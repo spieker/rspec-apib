@@ -144,7 +144,7 @@ GEM
       method_source
       rake (>= 0.8.7)
       thor (>= 0.20.3, < 2.0)
-    rake (10.5.0)
+    rake (13.0.1)
     rb-fsevent (0.10.3)
     rb-inotify (0.10.0)
       ffi (~> 1.0)
@@ -194,7 +194,7 @@ DEPENDENCIES
   guard (~> 2.13.0)
   guard-rspec (~> 4.6.4)
   pry
-  rake (~> 10.0)
+  rake (~> 13.0)
   rspec-apib!
 
 BUNDLED WITH
