@@ -69,5 +69,14 @@ describe RSpec::Apib::CommentsParser do
       subject = described_class.new(example)
       expect(subject.description).to eql "FooBar\n------\nBaz"
     end
+
+    # --- apib
+    # + foo
+    #   + bar
+    # ---
+    it 'keeps indentations in markup' do |example|
+      subject = described_class.new(example)
+      expect(subject.description).to eql "+ foo\n  + bar"
+    end
   end
 end

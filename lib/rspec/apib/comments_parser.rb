@@ -17,7 +17,7 @@ module RSpec
         i = line -2
         result = []
 
-        while (i >= 0 && match = lines[i].match(/\A\s*#\s*(.*)/)) do
+        while (i >= 0 && match = lines[i].match(/\A\s*#\s(.*)/)) do
           result.unshift(match[1])
           i -= 1
         end
