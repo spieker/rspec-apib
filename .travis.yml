@@ -1,4 +1,13 @@
 language: ruby
 rvm:
-  - 2.2.1
-before_install: gem install bundler -v 1.10.6
+  - 2.5
+env:
+  - RAILS_VERSION='~> 4.0' RSPEC_VERSION='~> 3.0'
+  - RAILS_VERSION='~> 5.0' RSPEC_VERSION='~> 3.0'
+  - RAILS_VERSION='~> 6.0' RSPEC_VERSION='~> 3.0'
+  - RAILS_VERSION='~> 4.0' RSPEC_VERSION='~> 4.0'
+  - RAILS_VERSION='~> 5.0' RSPEC_VERSION='~> 4.0'
+  - RAILS_VERSION='~> 6.0' RSPEC_VERSION='~> 4.0'
+before_install:
+  - gem install bundler -v 1
+  - rm Gemfile.lock
