@@ -2,12 +2,13 @@ language: ruby
 rvm:
   - 2.5
 env:
-  - RAILS_VERSION='~> 4.0' RSPEC_VERSION='~> 3.0'
-  - RAILS_VERSION='~> 5.0' RSPEC_VERSION='~> 3.0'
-  - RAILS_VERSION='~> 6.0' RSPEC_VERSION='~> 3.0'
-  - RAILS_VERSION='~> 4.0' RSPEC_VERSION='~> 4.0'
-  - RAILS_VERSION='~> 5.0' RSPEC_VERSION='~> 4.0'
-  - RAILS_VERSION='~> 6.0' RSPEC_VERSION='~> 4.0'
+  - NO_LOCK=false
+  - NO_LOCK=true RAILS_VERSION='~> 4.0' RSPEC_VERSION='~> 3.0'
+  - NO_LOCK=true RAILS_VERSION='~> 5.0' RSPEC_VERSION='~> 3.0'
+  - NO_LOCK=true RAILS_VERSION='~> 6.0' RSPEC_VERSION='~> 3.0'
+  - NO_LOCK=true RAILS_VERSION='~> 4.0' RSPEC_VERSION='~> 4.0'
+  - NO_LOCK=true RAILS_VERSION='~> 5.0' RSPEC_VERSION='~> 4.0'
+  - NO_LOCK=true RAILS_VERSION='~> 6.0' RSPEC_VERSION='~> 4.0'
 before_install:
   - gem install bundler -v 1
-  - rm Gemfile.lock
+  - $NO_LOCK && rm Gemfile.lock || true
