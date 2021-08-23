@@ -1,0 +1,64 @@
+name: Main
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    env:
+      RAILS_ENV: test
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7
+
+      - name: Run tests (rails5, rspec3)
+        env:
+          RAILS_VERSION: '~> 5.0'
+          RSPEC_VERSION: '~> 3.0'
+        run: |
+          gem install bundler -v 1
+          rm Gemfile.lock
+          bundle install
+          bundle exec rspec
+
+      - name: Run tests (rails6, rspec3)
+        env:
+          RAILS_VERSION: '~> 6.0'
+          RSPEC_VERSION: '~> 3.0'
+        run: |
+          gem install bundler -v 1
+          rm Gemfile.lock
+          bundle install
+          bundle exec rspec
+
+      - name: Run tests (rails5, rspec4)
+        env:
+          RAILS_VERSION: '~> 5.0'
+          RSPEC_VERSION: '~> 4.0'
+        run: |
+          gem install bundler -v 1
+          rm Gemfile.lock
+          bundle install
+          bundle exec rspec
+
+      - name: Run tests (rails6, rspec4)
+        env:
+          RAILS_VERSION: '~> 6.0'
+          RSPEC_VERSION: '~> 4.0'
+        run: |
+          gem install bundler -v 1
+          rm Gemfile.lock
+          bundle install
+          bundle exec rspec
+
+      - name: Run tests (as locked)
+        run: |
+          gem install bundler -v 1
+          bundle install
+          bundle exec rspec
