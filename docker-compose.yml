@@ -1,13 +1,11 @@
-gem:
-  build: .
-  command: guard -p
-  volumes:
-    - .:/usr/src/app
-  volumes_from:
-    - bundle
+version: '3'
+services:
+  gem:
+    build: .
+    command: guard -p
+    volumes:
+      - .:/usr/src/app
+      - bundle:/usr/local/bundle
 
-bundle:
-  image: rspecapib_gem
-  command: echo "I'm a little data container, short and stout..."
-  volumes:
-    - /usr/local/bundle
+volumes:
+  bundle:
