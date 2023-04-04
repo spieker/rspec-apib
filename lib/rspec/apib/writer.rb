@@ -16,7 +16,7 @@ module RSpec
       private
 
       def write_to_file(data)
-        File.open(RSpec::Apib.config.dest_file, 'w') do |file|
+        File.open(RSpec::Apib.config.dest_file, 'wb') do |file|
           file.write(data)
         end
       end

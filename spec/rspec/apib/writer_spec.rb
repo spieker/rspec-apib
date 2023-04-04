@@ -44,7 +44,7 @@ describe RSpec::Apib::Writer do
   describe '#write_to_file' do
     it 'opens the configured file' do
       allow(RSpec::Apib.config).to receive(:dest_file).and_return 'foo'
-      expect(File).to receive(:open).with('foo', 'w')
+      expect(File).to receive(:open).with('foo', 'wb')
       subject.send :write_to_file, ''
     end
 
