@@ -60,7 +60,7 @@ module RSpec
             apib += "\n"
             unless data[:request][:body].blank?
               apib += "    + Body\n\n"
-              apib += data[:request][:body].to_s.indent(12)
+              apib += extract_content(data[:request][:body]).indent(12)
               apib += "\n\n"
             end
             data[:response].sort { |a, b| a[:status] - b[:status] }.each do |response|
@@ -71,9 +71,9 @@ module RSpec
                 apib += "            #{header}: #{value}\n"
               end
               apib += "\n"
-              unless response[:body].blank?
+              unless response[:body].to_s.scrub.blank?
                 apib += "    + Body\n\n"
-                apib += response[:body].to_s.indent(12)
+                apib += extract_content(response[:body]).indent(12)
                 apib += "\n\n"
               end
             end
@@ -81,6 +81,14 @@ module RSpec
         end
 
         apib
+      end
+
+      def extract_content(data = "")
+        binary_content?(data) ? '[REDACTED BINARY CONTENT]' : data.to_s
+      end
+
+      def binary_content?(data)
+        data.include?("content-disposition: form-data;") || data.bytes.any? { |byte| byte < 32 && byte != 9 && byte != 10 && byte != 13 }
       end
     end
   end
