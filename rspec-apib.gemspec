@@ -24,5 +24,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'guard-rspec', '~> 4.7.3'
   spec.add_development_dependency 'pry'
   spec.add_dependency 'rails', (ENV['RAILS_VERSION'] || '>= 6.0.0')
-  spec.add_dependency 'rspec-rails', (ENV['RSPEC_VERSION'] || '~> 4.0')
+  spec.add_dependency 'rspec-rails', (ENV['RSPEC_VERSION'] || '>= 4.0')
 end
